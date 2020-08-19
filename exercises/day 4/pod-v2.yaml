@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-custom
+  labels:
+    app: nginx
+    version: v2
+spec:
+  containers:
+  - name: nginx-container-custom
+    image: adityadev01/nginx-custom:0.1
