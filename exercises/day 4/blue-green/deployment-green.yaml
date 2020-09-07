@@ -1,17 +1,22 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: nginx-rs
+  name: nginx-deployment-green
+  labels:
+    app: nginx
+    env: green
 spec:
-  replicas: 5
+  replicas: 10
   selector:
     matchLabels:
       app: nginx
+      env: green
   template:
     metadata:
       labels:
         app: nginx
+        env: green
     spec:
       containers:
       - name: nginx
-        image: nginx
+        image: vergeops/versioned-nginx:2.0

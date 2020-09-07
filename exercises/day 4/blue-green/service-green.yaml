@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-service-green
+spec:
+  selector:
+    app: nginx
+    version: green
+  ports:
+  - protocol: TCP
+    port: 80
+    nodePort: 30080
+  type: NodePort

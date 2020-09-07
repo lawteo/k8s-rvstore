@@ -1,9 +1,13 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: nginx-rs
+  name: nginx-deployment
+  labels:
+    app: nginx
 spec:
-  replicas: 5
+  replicas: 10
+  strategy: 
+    type: Recreate
   selector:
     matchLabels:
       app: nginx
@@ -14,4 +18,4 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx
+        image: vergeops/versioned-nginx:1.0

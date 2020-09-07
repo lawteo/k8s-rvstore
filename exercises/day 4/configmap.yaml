@@ -26,6 +26,9 @@ spec:
       containers:
       - name: mongodb
         image: mongo
+        env:
+          - name: I_AM_CONFIG_VAR
+            value: "Hello"
         envFrom:
         - configMapRef:
             name: mongodb-config

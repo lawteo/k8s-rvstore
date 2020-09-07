@@ -1,17 +1,22 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: nginx-rs
+  name: nginx-deployment-blue
+  labels:
+    app: nginx
+    env: blue
 spec:
-  replicas: 5
+  replicas: 10
   selector:
     matchLabels:
       app: nginx
+      env: blue
   template:
     metadata:
       labels:
         app: nginx
+        env: blue
     spec:
       containers:
       - name: nginx
-        image: nginx
+        image: vergeops/versioned-nginx:1.0
