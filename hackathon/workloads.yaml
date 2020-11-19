@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ui-deployment
-  labels:
-    app: ui
 spec:
   replicas: 2
   selector:
@@ -17,25 +15,31 @@ spec:
       containers:
       - name: ui
         image: vergeops/k8s-rvstore-ui:1.0
-        imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - name: ui-port
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: ui-port
         readinessProbe:
           httpGet:
             path: /
-            port: 80
-          initialDelaySeconds: 5
+            port: ui-port
           periodSeconds: 10
           successThreshold: 2
           failureThreshold: 1
-
+        startupProbe:
+          httpGet:
+            path: /
+            port: health-port
+          periodSeconds: 10
+          failureThreshold: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: product-api-deployment
-  labels:
-    app: product-api
 spec:
   replicas: 2
   selector:
@@ -46,30 +50,44 @@ spec:
       labels:
         app: product-api
     spec:
+      volumes:
+      - name: products-volume
+        configMap:
+          name: products-config   
       containers:
       - name: rvstore-product-api
         image: vergeops/k8s-rvstore-product-api:1.0
-        imagePullPolicy: Always
-        envFrom:
-        - configMapRef:
-            name: workload-config
         ports:
-        - containerPort: 9001
+        - name: product-port
+          containerPort: 9001
+        volumeMounts:
+        - name: products-volume
+          mountPath: /data/products
+        env:
+        - name: PRODUCT_FILE_LOCATION
+          value: /data/products
+        livenessProbe:
+          httpGet:
+            path: /products/
+            port: product-port
         readinessProbe:
           httpGet:
             path: /products/
-            port: 9001
-          initialDelaySeconds: 10
+            port: product-port
           periodSeconds: 10
           successThreshold: 2
           failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /products/
+            port: product-port
+          periodSeconds: 10
+          failureThreshold: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-api-deployment
-  labels:
-    app: auth-api
 spec:
   replicas: 2
   selector:
@@ -83,27 +101,31 @@ spec:
       containers:
       - name: rvstore-auth-api
         image: vergeops/k8s-rvstore-auth-api:1.0
-        imagePullPolicy: Always
-        envFrom:
-        - configMapRef:
-            name: workload-config
         ports:
-        - containerPort: 9003
+        - name: auth-port
+          containerPort: 9003
+        livenessProbe:
+          httpGet:
+            path: /auth/login
+            port: auth-port
         readinessProbe:
           httpGet:
             path: /auth/login
-            port: 9003
-          initialDelaySeconds: 10
+            port: auth-port
           periodSeconds: 10
           successThreshold: 2
           failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /auth/login
+            port: auth-port
+          periodSeconds: 10
+          failureThreshold: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: order-api-deployment
-  labels:
-    app: order-api
 spec:
   replicas: 2
   selector:
@@ -117,28 +139,35 @@ spec:
       containers:
       - name: rvstore-order-api
         image: vergeops/k8s-rvstore-order-api:1.0
-        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: workload-config
         ports:
-        - containerPort: 9002
+        - name: order-port
+          containerPort: 9002
+        livenessProbe:
+          httpGet:
+            path: /orders
+            port: order-port
         readinessProbe:
           httpGet:
             path: /orders
-            port: 9002
-          initialDelaySeconds: 10
+            port: order-port
           periodSeconds: 10
           successThreshold: 2
           failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /orders
+            port: order-port
+          periodSeconds: 10
+          failureThreshold: 5
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: order-simulator-deployment
-  labels:
-    app: order-simulator
 spec:
   replicas: 1
   selector:
@@ -152,7 +181,6 @@ spec:
       containers:
       - name: rvstore-order-simulator
         image: vergeops/k8s-rvstore-order-simulator:1.0
-        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: workload-config
@@ -162,8 +190,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway-deployment
-  labels:
-    app: api-gateway
 spec:
   replicas: 2
   selector:
@@ -177,15 +203,26 @@ spec:
       containers:
       - name: rvstore-api-gateway
         image: vergeops/k8s-rvstore-api-gateway:1.0
-        imagePullPolicy: Always
+        ports:
+        - name: gw-port
+          containerPort: 9000
         envFrom:
         - configMapRef:
             name: workload-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: gw-port
         readinessProbe:
           httpGet:
             path: /health
-            port: 9000
-          initialDelaySeconds: 10
+            port: gw-port
           periodSeconds: 10
           successThreshold: 2
           failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: gw-port
+          periodSeconds: 10
+          failureThreshold: 5
