@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 3
+  replicas: 10
   selector:
     matchLabels:
       app: nginx
@@ -17,12 +17,10 @@ spec:
       containers:
       - name: nginx
         image: vergeops/versioned-nginx:liveness
-        # runs in same pod, should complete from primary container starts, multiple possible 
-        # liveliness & rediness not supported, use case copy a git repo or other file to volume
-      initContainers:  
+      initContainers:
       - name: random-wait
         image: busybox:1.28
-        command: ['sh', '-c', 'echo Sleeping...; sleep $((RANDOM % 40)); echo Done;']
+        command: ['sh', '-c', 'echo Sleeping...; sleep $((RANDOM % 30)); echo Done;']
 ---
 kind: Service
 apiVersion: v1

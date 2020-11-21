@@ -8,4 +8,4 @@ metadata:
 spec:
   containers:
   - name: nginx-container-custom
-    image: adityadev01/nginx-custom:0.1
+    image: nginx-custom:0.1

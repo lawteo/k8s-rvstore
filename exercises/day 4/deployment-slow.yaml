@@ -5,8 +5,8 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 20
-  minReadySeconds: 10
+  replicas: 10
+  minReadySeconds: 20
   strategy:
     type: RollingUpdate
     rollingUpdate:

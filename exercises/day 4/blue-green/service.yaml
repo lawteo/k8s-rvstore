@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: nginx
-    version: blue
+    version: v1
   ports:
   - protocol: TCP
     port: 80
