@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: web
+    image: nginx
+  - name: jenkins
+    image: jenkins
+
+   #kubectl exec -i -t nginx-pod --container web -- /bin/bash
+   #kubectl exec -i -t nginx-pod --container jenkins -- /bin/bash 
