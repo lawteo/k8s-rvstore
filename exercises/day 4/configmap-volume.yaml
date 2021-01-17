@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-config
+data:
+  inventory.json: |
+    [
+      {"id":"p1","available":10},
+      {"id":"p2","available":5},
+      {"id":"p3","available":81},
+      {"id":"p4","available":32}
+    ]
+  names.json: |
+    [
+      {"id":"p1", name": "product one"},
+      {"id":"p2", name": "product two"},
+      {"id":"p3", name": "product three"},
+      {"id":"p4", name": "product four"}
+    ]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+      - name: inventory-volume
+        configMap:
+          name: inventory-config   
+      containers:
+      - name: nginx
+        image: vergeops/versioned-nginx:1.0
+        volumeMounts:
+          - name: inventory-volume
+            mountPath: /data/inventory
