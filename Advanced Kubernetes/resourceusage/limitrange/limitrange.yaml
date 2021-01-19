@@ -5,16 +5,16 @@ metadata:
   namespace: advk8s
 spec:
   limits:
-    - default:
+    - default: # default limits
         cpu: 500m
         memory: 512Mi
-      defaultRequest:
+      defaultRequest: # default request
         cpu: 250m
         memory: 256Mi
-      min:
+      min: # minimum limit should be higher than this if specified for container 
         cpu: 250m
         memory: 128Mi
-      max:
-        cpu: 1500m
+      max: # maximum limit should be lower than this if specified for container
+        cpu: 1500m # this becomes the default if not defaults set
         memory: 1.5Gi
       type: Container
