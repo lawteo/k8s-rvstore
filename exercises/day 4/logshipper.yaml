@@ -5,7 +5,7 @@ metadata:
 spec:
   volumes:
     - name: shared-logs
-      emptyDir: {}
+      emptyDir: {} # creates empty directory on node, used a scratch space
 
   containers:
     - name: log-creator
