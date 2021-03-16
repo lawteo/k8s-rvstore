@@ -10,3 +10,6 @@ rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["services"]
   verbs: ["get", "watch", "list"]
+
+#write permissions (create, update) 
+#read permissions (get, list and watch)  
