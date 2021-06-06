@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-mongodb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-mongodb
+  template:
+    metadata:
+      labels:
+        app: order-mongodb
+    spec:
+      #      volumes:
+      #      - name: mongo-volume
+      #        emptyDir: {}
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: orders-mongodb-container
+          image: mongo
+          envFrom:
+            - secretRef:
+                name: mongodb-secret
+#          command:
+#            - mongod
+#            - "--replSet"
+#            - rs0
+#          volumeMounts:
+#            - name: mongo-volume
+#              mountPath: /data/db
+          ports:
+            - containerPort: 27017
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rvstore-orders-mongodb
+spec:
+  selector:
+    app: order-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+  type: ClusterIP

@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      labels:
+        app: ui
+    spec:
+      containers:
+        - name: ui-container
+          image: vergeops/k8s-rvstore-ui:1.0
+          ports:
+            - name: ui-port
+              containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway-container
+          image: vergeops/k8s-rvstore-api-gateway:1.0
+          ports:
+            - name: gateway-port
+              containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: spring-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-api-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-api
+  template:
+    metadata:
+      labels:
+        app: product-api
+    spec:
+      volumes:
+        - name: product-volume
+          configMap:
+            name: products-config
+      containers:
+        - name: product-container
+          image: vergeops/k8s-rvstore-product-api:1.0
+          ports:
+            - name: product-port
+              containerPort: 9001
+          volumeMounts:
+            - name: product-volume
+              mountPath: /data/products
+          env:
+            - name: PRODUCT_FILE_LOCATION
+              value: /data/products
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-api-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-api
+  template:
+    metadata:
+      labels:
+        app: auth-api
+    spec:
+      containers:
+        - name: auth-container
+          image: vergeops/k8s-rvstore-auth-api:1.0
+          ports:
+            - name: auth-port
+              containerPort: 9003
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+        - name: order-container
+          image: vergeops/k8s-rvstore-order-api:1.0
+          ports:
+            - name: auth-port
+              containerPort: 9002
+          envFrom:
+            - configMapRef:
+                name: spring-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-simulator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-simulator
+  template:
+    metadata:
+      labels:
+        app: order-simulator
+    spec:
+      containers:
+        - name: order-simulator-container
+          image: vergeops/k8s-rvstore-order-simulator:1.0
+          envFrom:
+            - configMapRef:
+                name: spring-config
