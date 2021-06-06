@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-service-new
+spec:
+  selector:
+    app: nginx-new
+  ports:
+  - protocol: TCP
+    port: 80
+    nodePort: 30090
+  type: NodePort
